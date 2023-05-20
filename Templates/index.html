@@ -1,67 +1,130 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <title>Object Detection API</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <title>Climate Prediction API</title>
     <style>
         body {
-            background-color: #f1f1f1;
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f2f2f2;
         }
-        .jumbotron {
-            background-color: #337ab7;
-            color: white;
+
+        h1 {
+            text-align: center;
+            color: #333333;
+            margin-bottom: 20px;
         }
+
         form {
-            margin-top: 20px;
-            margin-bottom: 40px;
-        }
-        h2 {
-            margin-top: 40px;
             margin-bottom: 20px;
+            text-align: center;
         }
-        img {
-            display: block;
-            margin: 0 auto;
-            max-width: 600px;
-            height: auto;
+
+        label {
+            font-weight: bold;
+            color: #333333;
+            margin-right: 10px;
+        }
+
+        input[type="text"] {
+            padding: 5px;
+            border: 1px solid #cccccc;
+            border-radius: 4px;
+        }
+
+        button[type="submit"] {
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        #prediction-result {
             margin-top: 20px;
-            margin-bottom: 20px;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        #prediction-result table {
+            display: inline-block;
+            text-align: left;
+        }
+
+        #prediction-result th,
+        #prediction-result td {
+            padding: 10px;
+            border-bottom: 1px solid #dddddd;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        #prediction-result th {
+            background-color: #4CAF50;
+            color: white;
+            text-transform: uppercase;
+        }
+
+        #prediction-result td {
+            background-color: #ffffff;
+            color: #333333;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1 class="jumbotron text-center">Object Detection API</h1>
-        <form class="form-horizontal" action="/submit" method="post" enctype="multipart/form-data">
-            <div class="form-group">
-                <label class="control-label col-sm-2" for="pwd">Upload Image:</label>
-                <div class="col-sm-10">
-                    <input type="file" class="form-control" name="image" required>
-                </div>
-            </div>
-            <div class="form-group">
-                <div class="col-sm-offset-2 col-sm-10">
-                    <button type="submit" class="btn btn-success">Submit</button>
-                </div>
-            </div>
-        </form>
+    <h1>Climate Prediction API</h1>
+    <form id="prediction-form">
+        <label for="year-input">Enter a Year:</label>
+        <input type="text" id="year-input" name="year" required>
+        <button type="submit">Predict</button>
+    </form>
 
-        {% if img_name %}
-        <h2> Your Prediction:</h2>
-        <div class="row">
-            <div class="col-md-6">
-                <img src="{{ url_for('static', filename=img_name) }}" height="400px" width="400px">
-            </div>
-            <div class="col-md-6">
-                <img src="{{ url_for('static', filename=output_name) }}" height="400px" width="400px">
-            </div>
-        </div>
-    {% endif %}
-    
-    </div>
+    <div id="prediction-result"></div>
+
+    <script>
+        const form = document.getElementById('prediction-form');
+        const resultDiv = document.getElementById('prediction-result');
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            resultDiv.textContent = 'Loading...';
+
+            const yearInput = document.getElementById('year-input').value;
+
+            const response = await fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ year: yearInput })
+            });
+
+            const data = await response.json();
+
+            resultDiv.innerHTML = '';
+
+            const table = document.createElement('table');
+
+            const tableHeaderKeys = Object.keys(data);
+            tableHeaderKeys.forEach((key) => {
+                const tableRow = document.createElement('tr');
+                const th = document.createElement('th');
+                th.textContent = key;
+                tableRow.appendChild(th);
+                const td = document.createElement('td');
+                const value = data[key];
+                td.textContent = typeof value === 'number' ? value.toFixed(6) : value;
+                tableRow.appendChild(td);
+                table.appendChild(tableRow);
+            });
+
+            resultDiv.appendChild(table);
+        });
+    </script>
 </body>
 </html>
