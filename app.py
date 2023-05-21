@@ -1,16 +1,16 @@
-from flask import Flask, request, jsonify, render_template
-import pandas as pd
-import numpy as np
-from sklearn.preprocessing import MinMaxScaler
-from tensorflow.keras.models import load_model
-import os
-import json
+from flask import Flask, request, jsonify, render_template  # Import necessary Flask modules
+import pandas as pd  # Import pandas for data manipulation
+import numpy as np  # Import numpy for numerical operations
+from sklearn.preprocessing import MinMaxScaler  # Import MinMaxScaler for data normalization
+from tensorflow.keras.models import load_model  # Import load_model from Keras for loading trained models
+import os  # Import os for file path operations
+import json  # Import json for working with JSON data
 
-app = Flask(__name__)
+app = Flask(__name__)  # Create an instance of the Flask application
 
 # Load the trained models
-model_ann = load_model('ann_model.h5')
-model_lstm = load_model('Lstm.h5')
+model_ann = load_model('ann_model.h5')  # Load the ANN model
+model_lstm = load_model('Lstm.h5')  # Load the LSTM model
 
 # Get the absolute path of the CSV file
 data_path = os.path.abspath('clean_data.csv')
@@ -20,9 +20,9 @@ data = pd.read_csv(data_path)
 
 # Define the target variables
 target_variables = ['CO2', 'Methane', 'Nitrous_Oxide', 'CFCs',
-       'Hydrochlorofluorocarbons', 'Hydrofluorocarbons',
-       'Total_Heat_Absorbed_GHG', 'Total_Greenhouse_Gases',
-       'GHG_Increase', '%_Change_GHG', 'Surface_Temperature', 'CO2_Concentration']
+                    'Hydrochlorofluorocarbons', 'Hydrofluorocarbons',
+                    'Total_Heat_Absorbed_GHG', 'Total_Greenhouse_Gases',
+                    'GHG_Increase', '%_Change_GHG', 'Surface_Temperature', 'CO2_Concentration']
 
 # Normalize the data
 scaler = MinMaxScaler()
@@ -33,7 +33,7 @@ time_steps = 1
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html')  # Render the 'index.html' template
 
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -107,9 +107,11 @@ def predict():
         power = int(np.floor(np.log10(abs(value))))
         coefficient = value / (10 ** power)
         if abs(power) > 5:
-            return f"{coefficient:.3f}x10^{power}"
+            coefficient_str = "{:.3e}".format(coefficient * (10 ** power))
+            return coefficient_str.replace("e+", "x10^").replace("e-", "x10^-")
         else:
-            return f"{value:.3f}"
+            return "{:.3f}".format(value)
+
 
     # Variables that require conversion to "joules per year"
     variables_to_convert = ["CO2", "Methane", "Nitrous_Oxide", "CFCs", "Hydrochlorofluorocarbons", "Hydrofluorocarbons",
@@ -117,7 +119,7 @@ def predict():
 
     # Units for the variables
     units = ["joules per year", "joules per year", "joules per year", "joules per year", "joules per year",
-             "joules per year", "joules per year", "ppm", "AGGI", "% change per year", "ºC", "ppm"]
+             "joules per year", "ppm", "ppm", "AGGI", "% change per year", "ºC", "ppm"]
 
     for variable, value in zip(target_variables, predicted_val[-1]):
         if variable in variables_to_convert:
@@ -133,4 +135,4 @@ def predict():
     return jsonify(prediction_dict)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True)  # Run the Flask application if the script is executed directly
