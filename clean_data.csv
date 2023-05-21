@@ -1,4 +1,4 @@
-Year,CO2,Methane,Nitrous_Oxide,CFCs,Hydrochlorofluorocarbons,Hydrofluorocarbons,Total_Greenhouse_Gases,Total_Greenhouse_Gases_Scaled,1990_Equals_1,Change,Surface_Temperature,CO2_Mean
+Year,CO2,Methane,Nitrous_Oxide,CFCs,Hydrochlorofluorocarbons,Hydrofluorocarbons,Total_Heat_Absorbed_GHG,Total_Greenhouse_Gases,GHG_Increase,%_Change_GHG,Surface_Temperature,CO2_Concentration
 1979,1.027,0.406,0.104,0.154,0.008,0.001,1.7,382,0.785,1.6772727272727268,0.1,336.84
 1980,1.06,0.413,0.104,0.163,0.009,0.001,1.749,386,0.808,2.3,0.33,338.76
 1981,1.079,0.42,0.107,0.172,0.009,0.001,1.788,388,0.825,1.8,0.38,340.12

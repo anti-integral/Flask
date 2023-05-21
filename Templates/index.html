@@ -74,6 +74,11 @@
             background-color: #ffffff;
             color: #333333;
         }
+
+        #additional-text {
+            margin-top: 20px;
+            text-align: left;
+        }
     </style>
 </head>
 <body>
@@ -81,19 +86,53 @@
     <form id="prediction-form">
         <label for="year-input">Enter a Year:</label>
         <input type="text" id="year-input" name="year" required>
-
+    
         <label for="model-input">Choose a model:</label>
         <select id="model-input" name="model_type">
             <option value="ann">ANN Model</option>
             <option value="lstm">LSTM Model</option>
-            <option value="linear_regression">Linear Regression</option>
-            <option value="polynomial_regression">Polynomial Regression</option>
-        </select>
-        
+            <option value="linear">Linear Regression</option>
+            <option value="polynomial">Polynomial Regression</option>
+        </select>        
+    
         <button type="submit">Predict</button>
-    </form>
+    </form>    
 
     <div id="prediction-result"></div>
+
+    <div id="additional-text" style="margin-left: 15px; margin-right: 15px;">
+        <p style="font-size: 24px; color: green; font-weight: bold; text-align: center">Column Descriptions</h2>
+
+        <p style="font-size: 16px;"><span style="color: green; font-weight: bold;">%_CHANGE_GHG</span> - This column represents the percentage change per year in the total radiative forcing by all long-lived greenhouse gases since the pre-industrial era.</p>
+    
+        <p style="font-size: 16px;"><span style="color: green; font-weight: bold;">CFCS</span> - This column represents the total radiative forcing (expressed in joules per year) exerted by chlorofluorocarbons (CFCs), a type of halogenated compound that is a long-lived greenhouse gas. Increases in HCFCs and HFCs have offset the decline from CFCs so that radiative forcing from the sum of these three chemical classes has increased.</p>
+    
+        <p style="font-size: 16px;"><span style="color: green; font-weight: bold;">CO2</span> - This column represents the total radiative forcing (expressed in joules per year) exerted by carbon dioxide (CO2), a long-lived greenhouse gas. The concentration of CO2 in the atmosphere has increased mainly due to human activity since the industrial revolution.</p>
+    
+        <p style="font-size: 16px;"><span style="color: green; font-weight: bold;">CO2_CONCENTRATION</span> - This column represents the annual CO2 mole fraction increase, expressed as a mole fraction in dry air (parts per million, or ppm). This measure is subject to change and recalibration based on the reference gas mixtures used and other quality control procedures.</p>
+    
+        <p style="font-size: 16px;"><span style="color: green; font-weight: bold;">GHG_INCREASE</span> - This column represents the Annual Greenhouse Gas Index (AGGI), a measure of the climate-warming influence of long-lived trace gases in the atmosphere and how that influence has changed since the onset of the industrial revolution.</p>
+    
+        <p style="font-size: 16px;"><span style="color: green; font-weight: bold;">HYDROCHLOROFLUOROCARBONS</span> - This column represents the total radiative forcing (expressed in joules per year) exerted by hydrochlorofluorocarbons (HCFCs), a type of halogenated compound that is a long-lived greenhouse gas. Increases in HCFCs and HFCs have offset the decline from CFCs so that radiative forcing from the sum of these three chemical classes has increased.</p>
+    
+        <p style="font-size: 16px;"><span style="color: green; font-weight: bold;">HYDROFLUOROCARBONS</span> - This column represents the total radiative forcing (expressed in joules per year) exerted by hydrofluorocarbons (HFCs), a type of halogenated compound that is a long-lived greenhouse gas. Increases in HCFCs and HFCs have offset the decline from CFCs so that radiative forcing from the sum of these three chemical classes has increased.</p>
+    
+        <p style="font-size: 16px;"><span style="color: green; font-weight: bold;">METHANE</span> - This column represents the total radiative forcing (expressed in joules per year) exerted by methane (CH4), a long-lived greenhouse gas. The atmospheric burden of methane has increased rapidly over recent years, with causes for the increase not fully understood.</p>
+    
+        <p style="font-size: 16px;"><span style="color: green; font-weight: bold;">NITROUS_OXIDE</span> - This column represents the total radiative forcing (expressed in joules per year) exerted by nitrous oxide (N2O), a long-lived greenhouse gas. The atmospheric burden of nitrous oxide continues to grow over time, with its annual increase also increasing.</p>
+    
+        <p style="font-size: 16px;"><span style="color: green; font-weight: bold;">SURFACE_TEMPERATURE</span> - This column represents the global surface temperature anomaly, calculated with respect to the 1901-2000 average. It is a measure of the deviation of the earth's surface temperature from a baseline. The data come from NOAA's Global Surface Temperature Analysis, which uses comprehensive data collections of increased global coverage over land and ocean surfaces.</p>
+    
+        <p style="font-size: 16px;"><span style="color: green; font-weight: bold;">TOTAL_GREENHOUSE_GASES</span> - This column represents the total radiative forcing (expressed in joules per year) by all long-lived greenhouse gases since the pre-industrial era.</p>
+    
+        <p style="font-size: 16px;"><span style="color: green; font-weight: bold;">TOTAL_HEAT_ABSORBED_GHG</span> - This column represents the total heat (expressed in joules per year).</p>
+
+        <img src="/Users/omsanan/Downloads/Flask/Viz1.png" alt="Visualization 1">
+        <img src="/Users/omsanan/Downloads/Flask/Viz2.png" alt="Visualization 2">
+        <img src="/Users/omsanan/Downloads/Flask/Viz3.png" alt="Visualization 3">
+        <img src="/Users/omsanan/Downloads/Flask/Heatmap.png" alt="Heatmap">
+        <img src="/Users/omsanan/Downloads/Flask/Results.png" alt="Results">
+    </div>
 
     <script>
         const form = document.getElementById('prediction-form');

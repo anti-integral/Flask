@@ -21,8 +21,8 @@ data = pd.read_csv(data_path)
 # Define the target variables
 target_variables = ['CO2', 'Methane', 'Nitrous_Oxide', 'CFCs',
        'Hydrochlorofluorocarbons', 'Hydrofluorocarbons',
-       'Total_Greenhouse_Gases', 'Total_Greenhouse_Gases_Scaled',
-       '1990_Equals_1', 'Change', 'Surface_Temperature', 'CO2_Mean']
+       'Total_Heat_Absorbed_GHG', 'Total_Greenhouse_Gases',
+       'GHG_Increase', '%_Change_GHG', 'Surface_Temperature', 'CO2_Concentration']
 
 # Normalize the data
 scaler = MinMaxScaler()
@@ -101,16 +101,15 @@ def predict():
     # Prepare the response
     prediction_dict = {}
 
-    def convert_units(value, unit):
-        # Constants
-        total_surface_area_earth_m2 = 5.1 * 10 ** 14  # Total surface area of the Earth in m²
-        seconds_per_year = 60 * 60 * 24 * 365  # Number of seconds in a year
-        if unit == "joules per year":
-            # Conversion
-            joules_per_year = value * total_surface_area_earth_m2 * seconds_per_year
-            return joules_per_year
+    def format_number(value):
+        if value == 0:
+            return "0"
+        power = int(np.floor(np.log10(abs(value))))
+        coefficient = value / (10 ** power)
+        if abs(power) > 5:
+            return f"{coefficient:.3f}x10^{power}"
         else:
-            return value  # If no conversion is required, return the original value
+            return f"{value:.3f}"
 
     # Variables that require conversion to "joules per year"
     variables_to_convert = ["CO2", "Methane", "Nitrous_Oxide", "CFCs", "Hydrochlorofluorocarbons", "Hydrofluorocarbons",
@@ -122,12 +121,12 @@ def predict():
 
     for variable, value in zip(target_variables, predicted_val[-1]):
         if variable in variables_to_convert:
-            converted_value = convert_units(value, "joules per year")
-            formatted_number = "{:.3e}".format(converted_value)
+            converted_value = value * 5.1e14 * 60 * 60 * 24 * 365
+            formatted_number = format_number(converted_value)
             prediction_dict[variable] = formatted_number + " " + "joules per year"
         else:
             unit_index = target_variables.index(variable)
-            formatted_number = "{:.3e}".format(value)
+            formatted_number = format_number(value)
             prediction_dict[variable] = formatted_number + " " + units[unit_index]
 
     # Return the predictions as JSON response
