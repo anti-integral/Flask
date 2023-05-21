@@ -26,7 +26,7 @@
             margin-right: 10px;
         }
 
-        input[type="text"] {
+        input[type="text"], select {
             padding: 5px;
             border: 1px solid #cccccc;
             border-radius: 4px;
@@ -81,6 +81,15 @@
     <form id="prediction-form">
         <label for="year-input">Enter a Year:</label>
         <input type="text" id="year-input" name="year" required>
+
+        <label for="model-input">Choose a model:</label>
+        <select id="model-input" name="model_type">
+            <option value="ann">ANN Model</option>
+            <option value="lstm">LSTM Model</option>
+            <option value="linear_regression">Linear Regression</option>
+            <option value="polynomial_regression">Polynomial Regression</option>
+        </select>
+        
         <button type="submit">Predict</button>
     </form>
 
@@ -95,13 +104,15 @@
             resultDiv.textContent = 'Loading...';
 
             const yearInput = document.getElementById('year-input').value;
+            const modelInput = document.getElementById('model-input').value; // Get the model type
+
+            const formData = new FormData();
+            formData.append('year', yearInput);
+            formData.append('model_type', modelInput);
 
             const response = await fetch('/predict', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ year: yearInput })
+                body: formData
             });
 
             const data = await response.json();
@@ -125,6 +136,6 @@
 
             resultDiv.appendChild(table);
         });
-    </script>
+    </script>    
 </body>
 </html>
