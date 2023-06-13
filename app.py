@@ -3,6 +3,7 @@ import pandas as pd  # Import pandas for data manipulation
 import numpy as np  # Import numpy for numerical operations
 from sklearn.preprocessing import MinMaxScaler  # Import MinMaxScaler for data normalization
 from tensorflow.keras.models import load_model  # Import load_model from Keras for loading trained models
+from pickle import load
 import os  # Import os for file path operations
 import json  # Import json for working with JSON data
 
@@ -31,25 +32,43 @@ data_scaled = scaler.fit_transform(data[target_variables])
 # Define the number of time steps (lags) to consider
 time_steps = 1
 
+
+class LSRM:
+    def __init__(self, coeff: np.ndarray, degree: int = 3):
+        self.coeff = coeff
+        self.degree = degree
+
+    def convert_watt_per_m2_to_joule_per_year(self, watt_per_m2):
+        # Constants
+        total_surface_area_earth_m2 = 5.1 * 10**14  # Total surface area of the Earth in m²
+        seconds_per_year = 60 * 60 * 24 * 365  # Number of seconds in a year
+        # Conversion
+        joules_per_year = watt_per_m2 * total_surface_area_earth_m2 * seconds_per_year
+        return joules_per_year
+
+    def predict(self, year: int):
+        all_predictions = []
+        for c in range(12):
+            prediction = 0
+            coeff = self.coeff[c]
+            for index2 in range(self.degree+1):
+                prediction+=coeff[len(coeff)-index2-1]*float(year)**index2
+                # converted_prediction = self.convert_watt_per_m2_to_joule_per_year(prediction)
+            all_predictions.append(prediction)
+        return all_predictions
+    
+
+def create_lsrm():
+    coeff = load(open('coefficients.pkl', 'rb'))
+    return LSRM(coeff)
+    
+
 @app.route('/')
 def index():
     return render_template('index.html')  # Render the 'index.html' template
 
-@app.route('/predict', methods=['POST'])
-def predict():
-    # Get the input year and model type from the request
-    input_year = int(request.form['year'])
-    model_type = request.form['model_type']
 
-    # Select the model based on the user's choice
-    if model_type == 'ann':
-        model = model_ann
-    elif model_type == 'lstm':
-        model = model_lstm
-    else:
-        return jsonify({'error': 'Invalid model type, choose between "ann" and "lstm".'})
-
-    # Rest of the code for prediction
+def predict_tf_models(model, input_year):
     predicted_val = []
     if input_year > 2021:
         # Prepare the input data
@@ -97,6 +116,32 @@ def predict():
 
         # Inverse transform the predicted values
         predicted_val = scaler.inverse_transform(predictions)
+    return predicted_val[-1]
+
+
+@app.route('/predict', methods=['POST'])
+def predict():
+    # Get the input year and model type from the request
+    input_year = int(request.form['year'])
+    model_type = request.form['model_type']
+
+    # Select the model based on the user's choice
+    if model_type == 'ann':
+        model = model_ann
+    elif model_type == 'lstm':
+        model = model_lstm
+    elif model_type == 'polynomial':
+        model = create_lsrm()
+    else:
+        return jsonify({'error': 'Invalid model type, choose between "ann"m "lstm" and "polynomial".'})
+
+    # Rest of the code for prediction
+    if model_type in ('ann', 'lstm'):
+        predicted_val = predict_tf_models(model, input_year)
+    elif model_type == 'polynomial':
+        predicted_val = model.predict(input_year)
+    else:
+        return jsonify({'error': 'Invalid model type, choose between "ann"m "lstm" and "polynomial".'})
 
     # Prepare the response
     prediction_dict = {}
@@ -121,7 +166,7 @@ def predict():
     units = ["joules per year", "joules per year", "joules per year", "joules per year", "joules per year",
              "joules per year", "ppm", "ppm", "AGGI", "% change per year", "ºC", "ppm"]
 
-    for variable, value in zip(target_variables, predicted_val[-1]):
+    for variable, value in zip(target_variables, predicted_val):
         if variable in variables_to_convert:
             converted_value = value * 5.1e14 * 60 * 60 * 24 * 365
             formatted_number = format_number(converted_value)
