@@ -36,7 +36,17 @@ venv\Scripts\activate
 source venv/bin/activate
 ```
 
-7. Install all dependencies with command:
+7. Install pip-compile tool
+```
+pip install pip-tools
+```
+
+8. Create dependencies file
+```
+pip-compile --output-file=requirements.txt requirements.in
+```
+
+9. Install all dependencies with command:
 ```
 pip3 install -r requirements.txt
 ```
