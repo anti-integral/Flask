@@ -55,3 +55,8 @@ Now you can run flask app from this terminal window by using command:
 ```
 flask run
 ```
+# Latest updates
+
+21.06.2023
+ - All models now lacated in a separate file
+ - 2 new models were added: ARIMA and MLP regresser. There are mot suitable models for time series with small dataset.
